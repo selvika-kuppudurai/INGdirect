@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import Header from '../components/header';
-// import Sidebar from '../components/Sidebar';
+import Header from '../../components/header';
 import { TbLayoutSidebarLeftCollapse } from "react-icons/tb";
 import { CiCirclePlus } from "react-icons/ci";
-import card1 from "../assets/card1.png"
-import card2 from "../assets/card2.png"
-import card3 from "../assets/card3.png"
+import card1 from "../../assets/card1.png";
+import card2 from "../../assets/card2.png";
+import card3 from "../../assets/card3.png";
 import "./style.scss"
-import UploadSection from '../components/UploadSection';
-// import './App.css'; // We'll define styles here
+import UploadSection from '../../components/UploadSection';
+import PPTGenerator from '../PPTGenerator';
+import SQLRetriever from '../SQLRetriever/SQLRetriever';
 
-function PPTGenerator() {
+function Home() {
   const [isopenPPTgenerator, setopenPPTgenerator] = useState(true)
   const [isopensqlgenerator, setopensqlgenerator] = useState()
   const [isopenpromptgenerator, setopenPromptgenerator] = useState()
@@ -40,26 +40,21 @@ function PPTGenerator() {
   // }, []);
   return (
     <div className="container-fluid">
-      <Header />
-      <div style={{ display: "flex", height: "100vh"}}>
-       <div style={{ backgroundColor: "#EAEFF8", width: "50px", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "1%" }}>
-          {/* <button style={{ borderRadius: "50%", border: "1px solid #ccc", marginBottom: "1rem", color: "#a9a9a9"}}>+</button> */}<CiCirclePlus style={{ width: "22px", height: "22px", color: "#a9a9a9" }} />
-          {/* <button style={{ padding: "4px", border: "1px solid #ccc", borderRadius: "4px" }}>▤</button> */}<TbLayoutSidebarLeftCollapse style={{ color: "#a9a9a9", marginTop: "25px" }} />
+      <div style={{ display: "flex", height: "100vh" }}>
+        <div style={{ backgroundColor: "#EAEFF8", width: "50px", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "1%" }}>
+          <CiCirclePlus style={{ width: "22px", height: "22px", color: "#a9a9a9" }} />
+          <TbLayoutSidebarLeftCollapse style={{ color: "#a9a9a9", marginTop: "25px" }} />
         </div>
-      <div>
-        {/* Sidebar */}
-       
-
-       
+        <div>
           <div
             style={{
               display: "flex",
               gap: "1.5rem",
-               margin: "1rem"
+              margin: "1rem"
             }}
           >
             <div className='tabdesign' style={{ border: isopenPPTgenerator ? "2px solid #1C57AB" : "2px solid #E5E7EB", backgroundColor: isopenPPTgenerator ? "#F6FAFE" : "", boxShadow: isopenPPTgenerator ? "1px 1px 4px 0px #00000040" : "" }} onClick={() => Pptgenerator()}>
-              <img className = "imagedesign" src={card3} alt="ppt" />
+              <img className="imagedesign" src={card3} alt="ppt" />
               <div>
                 <p className='headerdesign'>PPT Generator</p>
                 <p className='textdesign'>Turn reports into polished presentations in seconds</p>
@@ -68,7 +63,7 @@ function PPTGenerator() {
 
             {/* Card 2 */}
             <div className='tabdesign' style={{ border: isopensqlgenerator ? "2px solid #1C57AB" : "2px solid #E5E7EB", backgroundColor: isopensqlgenerator ? "#F6FAFE" : "", boxShadow: isopensqlgenerator ? "1px 1px 4px 0px #00000040" : "" }} onClick={() => Sqlgenerator()}>
-              <img className = "imagedesign" src={card2} alt="sql"/>
+              <img className="imagedesign" src={card2} alt="sql" />
               <div>
                 <p className='headerdesign'>SQL Retriever</p>
                 <p className='textdesign'>Generate SQL queries instantly from natural language prompts</p>
@@ -77,24 +72,30 @@ function PPTGenerator() {
 
             {/* Card 3 */}
             <div className='tabdesign' style={{ border: isopenpromptgenerator ? "2px solid #1C57AB" : "2px solid #E5E7EB", backgroundColor: isopenpromptgenerator ? "#F6FAFE" : "", boxShadow: isopenpromptgenerator ? "1px 1px 4px 0px #00000040" : "" }} onClick={() => Promptgenerator()}>
-              <img src={card1} className = "imagedesign" alt="prompt"/>
+              <img src={card1} className="imagedesign" alt="prompt" />
               <div>
                 <p className='headerdesign'>Prompt Maker</p>
                 <p className='textdesign'>Craft smart prompts effortlessly to get the insights you need</p>
               </div>
             </div>
-             
+
           </div>
           <div className="borderline" > </div>
-          <UploadSection/>
-           {/* <UploadSection/> */}
-        
+
+          {isopenPPTgenerator &&
+            <PPTGenerator />
+          }
+
+          {isopensqlgenerator &&
+            <SQLRetriever />
+          }
+
+        </div>
+
+
       </div>
-      
-     
-    </div>
     </div>
   );
 }
 
-export default PPTGenerator;
+export default Home;
