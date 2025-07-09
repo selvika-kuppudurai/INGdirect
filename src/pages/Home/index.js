@@ -9,7 +9,8 @@ import card3 from "../../assets/card3.png";
 import "./style.scss"
 import UploadSection from '../../components/UploadSection';
 import PPTGenerator from '../PPTGenerator';
-import SQLRetriever from '../SQLRetriever/SQLRetriever';
+import SQLRetriever from '../SQLRetriever';
+import PromptMaker from '../PromptMaker';
 
 function Home() {
   const [isopenPPTgenerator, setopenPPTgenerator] = useState(true)
@@ -88,6 +89,10 @@ function Home() {
 
           {isopensqlgenerator &&
             <SQLRetriever />
+          }
+
+          {isopenpromptgenerator &&
+            <PromptMaker />
           }
 
         </div>
