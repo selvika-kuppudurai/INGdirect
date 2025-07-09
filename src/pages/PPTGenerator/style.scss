@@ -29,7 +29,7 @@
       margin-top: 3%;
     text-align: center;
   //   color: #555;
-    margin-bottom: 30px;
+    margin-bottom: 5%;
     color: #838383;
     font-size: 10px;
     
@@ -108,7 +108,7 @@
   
   .ppt-prompt-box {
       width: 1331px;
-  height: 120px;
+  height: 100%;
   border-radius: 10px;
   border-width: 1px;
   gap: 20px;
@@ -208,7 +208,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 320px;
+  width: 400px;
   height: 100vh;
   background-color: #fff;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
@@ -261,7 +261,7 @@ margin-left: 10% !important;
   padding: 16px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 600px;
-  margin: 20px auto;
+  
 }
 
 .ppt-preview {
@@ -274,10 +274,10 @@ margin-left: 10% !important;
   justify-content: center;
 }
 
-.ppt-icon {
-  width: 40px;
-  height: auto;
-}
+// .ppt-icon {
+//   width: 40px;
+//   height: auto;
+// }
 
 .ppt-name {
   font-weight: 500;
@@ -309,4 +309,64 @@ margin-left: 10% !important;
 
 .action-icons a:hover {
   transform: scale(1.1);
+}
+
+.colorchange{
+  color: #1C57AB;
+  font-size: 15px !important;
+}
+
+.marginright{
+  margin-right: 10px;
+}
+.css-1umw9bq-MuiSvgIcon-root{
+width: 80% !important;
+}
+
+.css-rizt0-MuiTypography-root{
+  font-size: 14px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.app-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all; // This ensures UI is completely unclickable
+  backdrop-filter: blur(3px);
+}
+
+.app-loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #0047AB;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+.app-loading-text {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #0047AB;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
