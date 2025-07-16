@@ -39,12 +39,16 @@
       margin-bottom: 5px !important;
     }
   }
-  
-  .ppt-icon {
+  .ppt-preview{
+ .ppt-icon {
     width: 9%;
-    margin-bottom: 15px;
+    // margin-bottom: 15px;
   }
-  
+  }
+ 
+  .iconpdf{
+        height: 30px;
+  }
   .ppt-input-section {
   //   display: flex;
   //   flex-wrap: wrap;
@@ -218,6 +222,11 @@
   overflow-y: auto;
   z-index: 1100; 
   transform: translateX(0%);
+
+  .app-loader{
+    width: 50px !important;
+    height: 50px !important;
+  }
 }
 
 .custom-sidebar-header {
@@ -264,6 +273,25 @@ margin-left: 10% !important;
   
 }
 
+.padding{
+  padding: 1rem;
+}
+.prompt-input1{
+    border: none;
+  outline: none;
+  font-size: 16px;
+  // padding: 12px 16px;
+  width: 100%;
+  background-color: transparent;
+}
+
+.fontsize14{
+  font-size: 12px !important;
+}
+.margin44{
+  margin: 44%;
+}
+
 .ppt-preview {
   background: #f5f5f5;
   border-radius: 8px;
@@ -301,10 +329,13 @@ margin-left: 10% !important;
   cursor: pointer;
 }
 
-.action-icons a {
+.action-icons{
+  color: #1C57AB;
+ a {
   color: #1a73e8;
   margin-left: 16px;
   transition: transform 0.2s ease;
+}
 }
 
 .action-icons a:hover {
@@ -369,4 +400,27 @@ width: 80% !important;
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Example loader animation */
+.app-loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #ccc;
+  border-top: 5px solid #1C57AB;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* or fixed height like 200px */
 }

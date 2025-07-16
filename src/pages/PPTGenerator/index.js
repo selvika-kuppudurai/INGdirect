@@ -8,8 +8,10 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FaRegFileAlt } from "react-icons/fa";
 import GeneratedPPTCard from "../GeneratedPPTCard/index.js"
 import { FaRedo, FaExternalLinkAlt, FaDownload } from "react-icons/fa";
-import pptLogo from "../../assets/logo.png";
+import pptLogo from "../../assets/pdf.png";
+import PDFPreview from "../../components/PDFviewer.js";
 import { debounce } from "lodash";
+import pdflogo from "../../assets/pdflogo.png"
 import {
   Drawer,
   Button,
@@ -27,33 +29,40 @@ import {
 import { Paper, Avatar, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SendIcon from '@mui/icons-material/Send';
 
 const PPTGenerator = () => {
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  const endpoint = process.env.REACT_APP_DUMMY_PPT_ENDPOINT;
+  const listurl = process.env.REACT_APP_API_LIST_USER
+  const fullUrl = `${baseUrl}${endpoint}`;
+  const uploadurl = process.env.REACT_APP_API_UPLOAD_URL
+
+
   // const [isGenerating, setIsGenerating] = useState(false);
+  const [ticker, setTicker] = useState()
   const [prompt, setPrompt] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerOpensuggestion, setDrawerOpensuggestions] = useState(false);
   const [selectedReportIndex, setSelectedReportIndex] = useState();
-  const [selectedReport1Index, setSelectedReport1Index] = useState();
   const [selectedpdf, setselectedpdf] = useState(false)
-
-  // const [file, setFile] = useState(null);
+  const [filename, setFilename] = useState('sample.pdf');
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploaddisable, setuploadbuttondisable] = useState(false)
 
   const [pptBlob, setPptBlob] = useState(null); // To store the response blob
   const [isGenerating, setIsGenerating] = useState(false);
-
-  // let reports = []
   const [reports, setreports] = useState([])
-  // const [reports1, setreports1] = useState([])
   const [selectedpreupload, setselectedpreupload] = useState(true)
 
-  const [ticker, setticker] = useState()
   const [uploaddone, setuploaddone] = useState(false)
+  const [pdfBase64, setPdfBase64] = useState('');
+
+  const [preview, setpreview] = useState(false)
+
+  const [loader, setLoader] = useState(false)
+  const [promptError, setPromptError] = useState('');
 
   //   const handleUpload = () => {
   //   fileInputRef.current.click(); // Trigger file input click
@@ -65,35 +74,104 @@ const PPTGenerator = () => {
     "Compare current year performance with the previous year", "Visualize key metrics: revenue, net profit, and EBITDA", "Extract and summarize risk factors mentioned in the report", "Create slides for financial ratios and KPIs.",
   ];
 
-  console.log('hhhhh', typeof reports1)
+
 
   const deletefile = () => {
     setSelectedFile(null)
+    setselectedpdf(false)
     setuploadbuttondisable(false)
   }
   const deletefile1 = () => {
     setselectedpreupload(true)
+    setselectedpdf(false)
     setSelectedReportIndex()
+    setPrompt("")
+    setTicker("")
   }
+
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    // link.href = `data:${mimeType};base64,${base64}`;
+    link.download = filename;
+    link.click();
+  };
+
+  const downloadPdf = () => {
+    const link = document.createElement('a');
+    link.href = `data:application/pdf;base64,${pdfBase64}`;
+    link.download = 'document.pdf';
+    link.click();
+  };
+  // useEffect(() => {
+  //   fetch('/base64.txt')
+  //     .then((res) => res.text())
+  //     .then((text) => {
+  //       try {
+  //         const json = JSON.parse(text);
+  //         const cleanBase64 = json.pdf_base64
+  //           .replace(/\s/g, '')
+  //           .replace(/^data:application\/pdf;base64,/, '');
+  //         setPdfBase64(cleanBase64);
+  //       } catch (err) {
+  //         console.error('❌ JSON parse error:', err);
+  //       }
+  //     })
+  //     .catch((err) => console.error('❌ Fetch error:', err));
+  // }, []);
+  // ../../assets/base64.txt?
+  // useEffect(() => {
+  //   fetch('/base64.txt')
+  //     .then((res) => {
+  //       if (!res.ok) {
+  //         throw new Error(`HTTP error! status: ${res.status}`);
+  //       }
+  //       return res.text();
+  //     })
+  //     .then((text) => {
+  //       try {
+  //         const jsonData = JSON.parse(text);
+  //         console.log('pdf_base64', jsonData)
+  //         console.log('jsonData.pdf_base64.trim()', jsonData.pdf_base64.trim())
+  //         setPdfBase64(jsonData.pdf_base64.trim());
+  //       } catch (parseErr) {
+  //         console.error('❌ JSON parse error:', parseErr.message);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error('❌ Fetch error:', err.message);
+  //     });
+  // }, []);
+  // useEffect(() => {
+  //   // Load and parse JSON from .txt
+  //   console.log('ggggggg')
+  //   fetch('../../assets/base64.txt')
+  //     .then(res => res.text())
+  //     .then((text) => {
+  //       const jsonData = JSON.parse(text);
+  //       console.log('json', jsonData)
+  //       if (jsonData?.pdf_base64) {
+  //         console.log('jsonData.pdf_base64.trim()', jsonData.pdf_base64.trim())
+  //         setPdfBase64(jsonData.pdf_base64.trim());
+  //       }
+  //     })
+  //     .catch(err => console.error('Error loading base64 PDF:', err));
+  // }, []);
 
   const triggerFileInputClick = () => {
     fileInputRef.current.click(); // Trigger browse
   };
   const handleFileChange = (event) => {
-    // fileInputRef.current.click();
-    // setFile(event.target.files[0]);
+
     const file = event.target.files[0];
     setSelectedFile(file);
     setuploadbuttondisable(true)
-    // setIsGenerating(true)
-    // You can now upload the file or store it
     console.log("Selected file:", file);
   };
 
   const handleUpload = async () => {
-    
+
     try {
-      const response = await fetch(" http://localhost:5000/list_files?user_id=selvika", {
+      const response = await fetch(`${baseUrl}${listurl}`, {
         method: "get",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +185,7 @@ const PPTGenerator = () => {
       console.log("Generated PPT Response:", result);
       setreports(result.files)
       setuploaddone(true)
-      
+
       // reports = result.files
       console.log('files', typeof reports)
       // reports.map(report => {
@@ -119,62 +197,77 @@ const PPTGenerator = () => {
       alert("Failed to generate PPT");
     }
 
-    // if (!selectedFile) return;
 
-    // const formData = new FormData();
-    // formData.append("file", selectedFile);
-
-    // // Make the API call
-    // fetch("http://localhost:5000/upload?user_id=selvika", {
-    //   method: "POST",
-    //   body: formData,
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     // alert("Upload successful!");
-    //     setSelectedFile()
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     alert("Upload failed.");
-    //   });
   };
   useEffect(() => {
     console.log("isGenerating:", isGenerating);
   }, [isGenerating]);
-
   const handleafterupload = async () => {
+    if (!prompt.trim()) {
+      setPromptError("Prompt is required.");
+      return;
+    }
+    setPromptError("");
+    console.log('loader', loader)
+    console.log(selectedpdf)
+    setLoader(true)
     try {
-      const response = await fetch("http://localhost:5000/dummy_ppt?user_id=abhijit_debnath", {
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-
         },
         body: JSON.stringify({
-          embedding_name: "heineken-holding-nv-annual-report-2023-final.pdf_embeddings.json",
-          prompt: "Illustrate how these financial risks could impede Heineken’s strategic objectives, such as market expansion, profitability targets, and shareholder value enhancement. Create hypothetical scenarios or reference historical instances where unmanaged risks led to financial setbacks for similar companies. Use visual storytelling elements like infographics or timelines to depict potential impacts over short and long-term horizons.",
-          ticker: "HEIO.AS"
+          embedding_name: `${selectedReportIndex}.json`,
+          prompt: prompt ? prompt : "",
+          ticker: ticker ? ticker : "",
         }),
-        // credentials: "include"
       });
-      console.log('ffff', response)
-      // if (!response) throw new Error("Failed to generate PPT");
-      const blob = await response.blob();
-      console.log('hhhh', blob)
-      setPptBlob(blob);
-      setselectedpdf(true)
 
-      // const result = await response.json();
-      // console.log("Generated PPT Response:", result);
+      // if (!response.ok) {
+      //   throw new Error("Failed to generate PPT");
+      // }
 
-      // ✅ Optionally show success message, update UI, etc.
+      const data = await response.json(); // ✅ parse JSON instead of blob
+      console.log("✅ Response JSON:", data);
+
+      const { pdf_base64, pptx_base64, ppt_name } = data;
+
+
+
+      // Convert base64 to Blob
+      const byteCharacters = atob(pptx_base64);
+      const byteNumbers = Array.from(byteCharacters, char => char.charCodeAt(0));
+      const byteArray = new Uint8Array(byteNumbers);
+      const pptBlob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+      try {
+        // const json = JSON.parse(text);
+        const cleanBase64 = pdf_base64
+          .replace(/\s/g, '')
+          .replace(/^data:application\/pdf;base64,/, '');
+        setPdfBase64(cleanBase64);
+      } catch (err) {
+        console.error('❌ JSON parse error:', err);
+      }
+      // ✅ Save blob and update state
+      console.log('pptBlob', pptBlob)
+      setPptBlob(pptBlob);
+      setselectedpdf(true);
+      setLoader(false)
+      console.log("🎉 PPT Blob created and stored");
+
     } catch (error) {
-      console.error("Error in prompt upload:", error);
+      console.error("❌ Error in prompt upload:", error);
       alert("Failed to generate PPT");
     }
-  }
+  };
+
   const handlepromptupload = async () => {
+    if (!prompt.trim()) {
+      setPromptError("Prompt is required.");
+      return;
+    }
+    setPromptError("");
     // setIsGenerating(true);
     try {
       console.log('vv', isGenerating)
@@ -186,53 +279,22 @@ const PPTGenerator = () => {
       formData.append("file", selectedFile);
 
       // Make the API call
-      fetch("http://localhost:5000/upload?user_id=selvika", {
+      fetch(`${baseUrl}${uploadurl}`, {
         method: "POST",
         body: formData,
       })
         .then((res) => res.json())
         .then((data) => {
           console.log(data)
-          // setselectedpdf(true)
-          // alert("Upload successful!");
-          // setSelectedFile()
+
           setuploaddone(true)
           setIsGenerating(false)
-          setticker('HEIO.AS')
-          setPrompt('Illustrate how these financial risks could impede Heineken’s strategic objectives, such as market expansion, profitability targets, and shareholder value enhancement. Create hypothetical scenarios or reference historical instances where unmanaged risks led to financial setbacks for similar companies. Use visual storytelling elements like infographics or timelines to depict potential impacts over short and long-term horizons.')
         })
     }
     catch (err) {
       console.error(err);
       alert("Upload failed.");
     }
-    // try {
-    //   const response = await fetch("http://localhost:5000/dummy_ppt?user_id=abhijit_debnath", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-
-    //     },
-    //     body: JSON.stringify({
-    //       embedding_name: "heineken-holding-nv-annual-report-2023-final.pdf_embeddings.json",
-    //       prompt: "Illustrate how these financial risks could impede Heineken’s strategic objectives, such as market expansion, profitability targets, and shareholder value enhancement. Create hypothetical scenarios or reference historical instances where unmanaged risks led to financial setbacks for similar companies. Use visual storytelling elements like infographics or timelines to depict potential impacts over short and long-term horizons.",
-    //       ticker: "HEIO.AS"
-    //     }),
-    //     // credentials: "include"
-    //   });
-    //   console.log('ffff',response)
-    //   // if (!response) throw new Error("Failed to generate PPT");
-    //   const blob = await response.blob();
-    //   console.log('hhhh', blob)
-    //    setPptBlob(blob);
-    //   // const result = await response.json();
-    //   // console.log("Generated PPT Response:", result);
-
-    //   // ✅ Optionally show success message, update UI, etc.
-    // } catch (error) {
-    //   console.error("Error in prompt upload:", error);
-    //   alert("Failed to generate PPT");
-    // }
   };
   const handleDownloadPPT = () => {
     if (!pptBlob) {
@@ -258,26 +320,19 @@ const PPTGenerator = () => {
 
   }
 
-  const handleChange = useRef(
-    debounce((val) => {
-      setPrompt(val);
-    }, 300)
-  ).current;
-  // const handleDownloadPPT = () => {
-  //   if (!pptBlob) {
-  //     alert("PPT not ready yet. Please generate it first.");
-  //     return;
-  //   }
+  const handleChange = (e) => {
+    setPrompt(e)
+  }
 
-  //   const url = URL.createObjectURL(pptBlob);
-  //   const a = document.createElement("a");
-  //   a.href = url;
-  //   a.download = "GeneratedPresentation.pptx";
-  //   document.body.appendChild(a);
-  //   a.click();
-  //   a.remove();
-  //   URL.revokeObjectURL(url);
-  // };
+
+  const handleSlideModifications = async (promp) => {
+    console.log("vvvvv", promp)
+  }
+  const handlepreview = () => {
+    setpreview(true)
+    // <PDFPreview base64={sampleBase64} />
+  }
+
   return (
 
     <div className="ppt-container">
@@ -296,22 +351,22 @@ const PPTGenerator = () => {
             <Paper elevation={1} sx={{ display: 'flex', alignItems: 'center', p: 2, mb: 2 }}>
 
               <Typography variant="body2">
-                Create <strong>{selectedFile.name}</strong> – using{' '}
+                Create {prompt} – using{' '}
                 <Link href="#" underline="hover" color="primary">
-                  {prompt}
+                  {selectedFile ? selectedFile.name : selectedReportIndex}
                 </Link>
               </Typography>
             </Paper>
           </div>
 
           {/* Response Card */}
-          <div>
-
+          <div className="d-flex">
+            <img src={pdflogo} alt="Icon" className="iconpdf"></img>
             <div className="ppt-card">
               {/* PPT Preview */}
               <div className="ppt-preview">
                 <img src={pptLogo} alt="PPT Icon" className="ppt-icon" />
-                <span className="ppt-name">{selectedFile.name}</span>
+                <span className="ppt-name">{selectedFile ? selectedFile.name : selectedReportIndex}</span>
               </div>
 
               {/* Actions */}
@@ -323,7 +378,7 @@ const PPTGenerator = () => {
 
                 <div className="action-icons">
                   <a rel="noopener noreferrer">
-                    <FaExternalLinkAlt size={16} />
+                    <FaExternalLinkAlt onClick={() => { handlepreview() }} size={16} />
                   </a>
                   <a download>
                     <FaDownload onClick={() => { handleDownloadPPT() }} size={16} />
@@ -338,16 +393,26 @@ const PPTGenerator = () => {
             <div className="app-loader" />
             <div className="app-loading-text">Uploading & Processing... Please wait</div>
           </div>
-        ) : (<div className="ppt-instructions">
-          <img src={pptimage} alt="PPT Icon" className="ppt-icon" />
-          <p>Step 1: Upload your annual report or select from pre-uploaded reports</p>
-          <p>Step 2: Enter the company’s ticker symbol (Optional)</p>
-          <p>Step 3: Describe your expectations in a prompt and press Enter to generate the PowerPoint</p>
-        </div>)}
+        ) : (
+          <div className="ppt-instructions">
+            {!loader ? (
+              <>
+                <img src={pptimage} alt="PPT Icon" className="ppt-icon" />
+                <p>Step 1: Upload your annual report or select from pre-uploaded reports</p>
+                <p>Step 2: Enter the company’s ticker symbol (Optional)</p>
+                <p>Step 3: Describe your expectations in a prompt and press Enter to generate the PowerPoint</p>
+              </>
+            ) : (
+              <div className="loader-container">
+                <div className="app-loader" />
+              </div>
+            )}
+          </div>
+        )}
 
 
         <div className="d-flex justify-content-center align-items-center">
-          <div className="p-4 rounded" style={{ backgroundColor: '#f1f5fb', minWidth: '80%', maxWidth: '800px' }}>
+          <div className="padding rounded" style={{ backgroundColor: '#f1f5fb', minWidth: '80%', maxWidth: '800px' }}>
             <div className="row fontsize align-items-center">
 
               {/* Left side - Upload Buttons */}
@@ -399,10 +464,13 @@ const PPTGenerator = () => {
                 <input
                   type="text"
                   id="ticker"
-                  className="form-control"
+                  className="form-control fontsize14"
+                  value={ticker}
+                  onChange={(e) => setTicker(e.target.value)}
                 // value={ticker}
                 // placeholder="e.g., AAPL"
                 />
+
               </div>
             </div>
           </div>
@@ -420,9 +488,15 @@ const PPTGenerator = () => {
           <input
             type="text"
             placeholder="Enter Prompt here"
-            // value={prompt}
+            value={prompt}
             onChange={(e) => handleChange(e.target.value)}
+            className="prompt-input1"
           />
+          {promptError && (
+            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+              {promptError}
+            </div>
+          )}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -464,7 +538,7 @@ const PPTGenerator = () => {
             </div>
             <Divider />
             <List>
-              {reports.map((report, index) => (
+              {reports.length === 0 ? <div className="app-loader margin44" /> : reports.map((report, index) => (
 
 
                 <ListItem
@@ -481,6 +555,7 @@ const PPTGenerator = () => {
                   )} */}
                 </ListItem>
               ))}
+
             </List>
           </div>
         </>
@@ -521,6 +596,14 @@ const PPTGenerator = () => {
           </div>
         </>
       )}
+      {preview && (
+        <PDFPreview
+          file={pdfBase64} // Use Base64 or blob URL if dynamic
+          onClose={() => setpreview(false)}
+          onSaveModifications={handleSlideModifications}
+        />
+      )}
+
 
     </div>
 
