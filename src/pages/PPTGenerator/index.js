@@ -351,7 +351,7 @@ const PPTGenerator = () => {
             <Paper elevation={1} sx={{ display: 'flex', alignItems: 'center', p: 2, mb: 2 }}>
 
               <Typography variant="body2">
-                Create {prompt} – using{' '}
+                Create <strong>{selectedFile ? selectedFile.name : selectedReportIndex}</strong> – using{' '}
                 <Link href="#" underline="hover" color="primary">
                   {selectedFile ? selectedFile.name : selectedReportIndex}
                 </Link>

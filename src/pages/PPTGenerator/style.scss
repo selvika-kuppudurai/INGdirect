@@ -379,7 +379,8 @@ width: 80% !important;
 
 .app-loader {
   border: 6px solid #f3f3f3;
-  border-top: 6px solid #0047AB;
+  // border-top: 6px solid #0047AB;
+  border-top: 6px solid #09f;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -390,7 +391,7 @@ width: 80% !important;
   margin-top: 16px;
   font-size: 16px;
   font-weight: 500;
-  color: #0047AB;
+  // color: #0047AB;
 }
 
 @keyframes spin {
